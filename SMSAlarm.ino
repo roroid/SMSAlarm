@@ -1,11 +1,11 @@
 #include "Timer.h"                     //http://github.com/JChristensen/Timer
-Timer t, t1,t2;
-int once;
-String trustedNo = "+40731491417";
-String password = "1234567890";
-int stare = 0;
- int sensorValue;
-//a-gsm settings============================
+Timer t, t1,t2; //Timers that will be used for launching functions at specific intervals
+int once;//when a breach is detected send only one SMS
+String trustedNo = "+40731491417";//This is the phone number that the system will send or receive SMS from
+String password = "1234567890";//Password for ARM and DISARM
+int stare = 0;//State of the system
+int sensorValue;//Value of LDR
+//a-gsm variables============================
 #include <SoftwareSerial.h>
 #define powerPIN     7//Arduino Digital pin used to power up / power down the modem
 #define resetPIN     6//Arduino Digital pin used to reset the modem 
@@ -22,21 +22,22 @@ int noSMS = 0, totSMS = 0;
 char readBuffer[200];
 ///========================================
 
-int effect[] = {13, 12, 11, 10, 9, 8};
-int count, n = 0;
+int effect[] = {13, 12, 11, 10, 9, 8};//Pins on wich are connected LED's for visual effect
+int count, n = 0;//Various variables
 void setup() {
+//Timers initialization
   t.every(250, alarmSMS);
   t1.every(50, lightEffect);
   t2.every(1, sensor);
-  
+
+//Led pin's initialization  
   for (int i = 0; i < 6; i++)
   {
     pinMode(effect[i], OUTPUT);
   }
-  // a-gsm setup=====================================
+// a-gsm setup=====================================
   SSerial.begin(9600);
   Serial.begin(57600);//1ms
-
   clearSSerial();
   clearSerial();
   delay(10);
@@ -57,11 +58,12 @@ void setup() {
 }
 
 void loop() {
-  t2.update();
-  t.update();
-  t1.update();
+  t.update();//Check for SMS
+  t1.update();//Light effect
+  t2.update();//Check sensor status
 }
 
+//This function is responsable to check for SMS and change the state of the system
 void alarmSMS() {
 
   listSMS();
@@ -91,7 +93,7 @@ void alarmSMS() {
     cnt--;
   }
 }
-
+//Function responsable for the LED effects
 void lightEffect() {
   if (stare == 0) {
     for (int i = 0; i < 6; i++) {digitalWrite(effect[i], HIGH);
@@ -120,7 +122,7 @@ void lightEffect() {
 
 
 }
-
+//Function that is continuously checking the sensor value and in case of trigger it will send an alert
 void sensor()
 {
 sensorValue=analogRead(A0);
@@ -131,7 +133,5 @@ if ((sendSMS("+40731491417","ALARM")==1)&(once==0)){ once=1;
   t.every(250, alarmSMS);
 
 }
-
-//send SMS once
 }
 }
