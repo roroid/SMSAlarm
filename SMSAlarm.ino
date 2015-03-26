@@ -1,5 +1,5 @@
 #include "Timer.h"                     //http://github.com/JChristensen/Timer
-Timer t, t1,t2; //Timers that will be used for launching functions at specific intervals
+Timer t, t1, t2; //Timers that will be used for launching functions at specific intervals
 int once;//when a breach is detected send only one SMS
 String trustedNo = "+40731491417";//This is the phone number that the system will send or receive SMS from
 String password = "1234567890";//Password for ARM and DISARM
@@ -25,17 +25,17 @@ char readBuffer[200];
 int effect[] = {13, 12, 11, 10, 9, 8};//Pins on wich are connected LED's for visual effect
 int count, n = 0;//Various variables
 void setup() {
-//Timers initialization
+  //Timers initialization
   t.every(250, alarmSMS);
   t1.every(50, lightEffect);
   t2.every(1, sensor);
 
-//Led pin's initialization  
+  //Led pin's initialization
   for (int i = 0; i < 6; i++)
   {
     pinMode(effect[i], OUTPUT);
   }
-// a-gsm setup=====================================
+  // a-gsm setup=====================================
   SSerial.begin(9600);
   Serial.begin(57600);//1ms
   clearSSerial();
@@ -96,42 +96,45 @@ void alarmSMS() {
 //Function responsable for the LED effects
 void lightEffect() {
   if (stare == 0) {
-    for (int i = 0; i < 6; i++) {digitalWrite(effect[i], HIGH);
-    delay(50);
-  digitalWrite(effect[i], LOW);}
-    for (int i = 6; i >=0; i--) {digitalWrite(effect[i], HIGH);
-    delay(50);
-    digitalWrite(effect[i], LOW);  
-}
+    for (int i = 0; i < 6; i++) {
+      digitalWrite(effect[i], HIGH);
+      delay(50);
+      digitalWrite(effect[i], LOW);
+    }
+    for (int i = 6; i >= 0; i--) {
+      digitalWrite(effect[i], HIGH);
+      delay(50);
+      digitalWrite(effect[i], LOW);
+    }
   }
   else if (stare == 1)
-  {once=0;
-    for (int i = 0; i < 6; i++) {digitalWrite(effect[i], HIGH);
- }
+  { once = 0;
+    for (int i = 0; i < 6; i++) {
+      digitalWrite(effect[i], HIGH);
+    }
 
   }
-  
-    else if (stare == 2)
+
+  else if (stare == 2)
   {
     for (int i = 0; i < 6; i++) digitalWrite(effect[i], HIGH);
     delay(50);
     for (int i = 0; i < 6; i++) digitalWrite(effect[i], LOW);
 
   }
-  
+
 
 
 }
 //Function that is continuously checking the sensor value and in case of trigger it will send an alert
 void sensor()
 {
-sensorValue=analogRead(A0);
-if((stare==1)&&(sensorValue<=950))
-{stare=2;
-t.stop(0);
-if ((sendSMS("+40731491417","ALARM")==1)&(once==0)){ once=1;
-  t.every(250, alarmSMS);
-
-}
-}
+  sensorValue = analogRead(A0);
+  if ((stare == 1) && (sensorValue <= 950))
+  { stare = 2;
+    if ((sendSMS("+40731491417", "ALARM") == 1) & (once == 0)) {
+      t1.update();//Light effect
+      once = 1;
+    }
+  }
 }
