@@ -76,14 +76,17 @@ void alarmSMS() {
       if (stare == 0) {
         stare = 1;
         Serial.println("ARMED");
+        sendSMS("+40731491417", "ARMED");
       }
       else if (stare == 1) {
         stare = 0;
         Serial.println("DISARMED");
+        sendSMS("+40731491417", "DISARMED");
       }
       else if (stare == 2) {
         stare = 1;
         Serial.println("ALARM CANCEL BUT STILL ARMED");
+        sendSMS("+40731491417", "ALARM CANCEL BUT STILL ARMED");        
       }
 
     }
@@ -132,7 +135,7 @@ void sensor()
   sensorValue = analogRead(A0);
   if ((stare == 1) && (sensorValue <= 950))
   { stare = 2;
-    if ((sendSMS("+40731491417", "ALARM") == 1) & (once == 0)) {
+    if ((sendSMS("+40731491417", "INTRUDER DETECTED") == 1) & (once == 0)) {
       t1.update();//Light effect
       once = 1;
     }
